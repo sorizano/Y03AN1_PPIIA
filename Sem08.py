@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
-
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+import plotly.express as px
 
 #Título al app
 st.title("K-Means Clustering con Streamlit")
@@ -28,3 +31,15 @@ if uploaded_file isnotNone:
         st.write(df.head())
     else:
         st.write("No se encontraron columnas categóricas en los datos")
+    
+    #Normalizar los datos
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df)
+
+    #Selección del número de clusters
+    st.write("### Selecciona el número de clusters")
+    num_clusters = st.slider("Número de cluster", min_value=2, max_value=10, value=3)
+
+    #Aplicando el K-Means
+    kmeans = kmeans(num_clusters=num_clusters, random_state=42)
+    clusters = kmeans.fit_predict(df_scaled)
