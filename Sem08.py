@@ -30,9 +30,28 @@ if uploaded_file is not None:
     else:
         st.write("No se encontraron columnas categóricas en los datos.")
 
+    # Verificar valores faltantes
+    if df.isnull().values.any():
+        st.write("### Valores faltantes encontrados")
+        st.write(df.isnull().sum())
+        
+        # Manejo de valores faltantes
+        # Opción 1: Eliminar filas con valores faltantes
+        # df = df.dropna()
+
+        # Opción 2: Imputar valores faltantes (por ejemplo, con la media)
+        df = df.fillna(df.mean())
+
+        st.write("### Datos después de manejar valores faltantes")
+        st.write(df.head())
+
+    # Asegurar que todas las columnas sean numéricas
+    for col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
     # Normalización de datos
     scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df)
+    df_scaled = scaler.fit_transform(df.dropna())  # En caso de eliminar filas con NaN
 
     # Selección del número de clusters
     st.write("### Selecciona el número de clusters")
