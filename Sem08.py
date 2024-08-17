@@ -50,7 +50,7 @@ if uploaded_file is not None:
 
     # Visualización de los clusters (solo si hay dos dimensiones)
     if df_scaled.shape[1] >= 2:
-        df_plot = pd.DataFrame(df_scaled, columns=[f'PC{i+1}'for i inrange(df_scaled.shape[1])])
+        df_plot = pd.DataFrame(df_scaled, columns=[f'PC{i+1}'for i in range(df_scaled.shape[1])])
         df_plot['Cluster'] = clusters
         fig = px.scatter(df_plot, x='PC1', y='PC2', color='Cluster', title='Visualización de Clusters')
         st.plotly_chart(fig)
