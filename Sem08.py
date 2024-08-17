@@ -80,3 +80,17 @@ if uploaded_file is not None:
     pca_df['Cluster'] = clusters
     fig = px.scatter(pca_df, x='PC1', y='PC2', color='Cluster', title='Visualización de Clusters usando PCA')
     st.plotly_chart(fig)
+
+    # Permitir la descarga del archivo Excel con los resultados
+    st.write("### Descargar resultados")
+    output_file = pd.ExcelWriter('resultados_cluster.xlsx')
+    df.to_excel(output_file, index=False)
+    output_file.save()
+
+    with open('resultados_cluster.xlsx', 'rb') as f:
+        st.download_button(
+            label="Descargar Excel con Resultados",
+            data=f,
+            file_name='resultados_cluster.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
