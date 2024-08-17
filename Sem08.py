@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 import plotly.express as px
 
 # Título de la app
-st.title("K-Means Clustering con Streamlit")
+st.title("K-Means Clustering con Análisis PCA usando Streamlit")
 
 # Subir archivo de Excel
 uploaded_file = st.file_uploader("Sube un archivo Excel", type=["xlsx"])
@@ -36,10 +37,6 @@ if uploaded_file is not None:
         st.write(df.isnull().sum())
         
         # Manejo de valores faltantes
-        # Opción 1: Eliminar filas con valores faltantes
-        # df = df.dropna()
-
-        # Opción 2: Imputar valores faltantes (por ejemplo, con la media)
         df = df.fillna(df.mean())
 
         st.write("### Datos después de manejar valores faltantes")
@@ -51,7 +48,19 @@ if uploaded_file is not None:
 
     # Normalización de datos
     scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df.dropna())  # En caso de eliminar filas con NaN
+    df_scaled = scaler.fit_transform(df.dropna())
+
+    # Aplicar PCA para entender las componentes principales
+    pca = PCA(n_components=2)
+    principal_components = pca.fit_transform(df_scaled)
+    pca_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+
+    st.write("### Varianza Explicada por cada Componente Principal:")
+    st.write(pca.explained_variance_ratio_)
+
+    st.write("### Cargas (Loadings) de las Variables en las Componentes Principales:")
+    loadings = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2'], index=df.columns)
+    st.write(loadings)
 
     # Selección del número de clusters
     st.write("### Selecciona el número de clusters")
@@ -67,11 +76,7 @@ if uploaded_file is not None:
     st.write("### Datos con el cluster asignado")
     st.write(df.head())
 
-    # Visualización de los clusters (solo si hay dos dimensiones)
-    if df_scaled.shape[1] >= 2:
-        df_plot = pd.DataFrame(df_scaled, columns=[f'PC{i+1}'for i in range(df_scaled.shape[1])])
-        df_plot['Cluster'] = clusters
-        fig = px.scatter(df_plot, x='PC1', y='PC2', color='Cluster', title='Visualización de Clusters')
-        st.plotly_chart(fig)
-    else:
-        st.write("Los datos deben tener al menos 2 columnas numéricas para visualizar los clusters.")
+    # Visualización de los clusters utilizando PCA
+    pca_df['Cluster'] = clusters
+    fig = px.scatter(pca_df, x='PC1', y='PC2', color='Cluster', title='Visualización de Clusters usando PCA')
+    st.plotly_chart(fig)
