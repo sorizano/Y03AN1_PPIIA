@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import plotly.express as px
-from io import BytesIO
+
 
 # Título de la app
 st.title("K-Means Clustering con Análisis PCA usando Streamlit")
@@ -82,16 +82,13 @@ if uploaded_file is not None:
     fig = px.scatter(pca_df, x='PC1', y='PC2', color='Cluster', title='Visualización de Clusters usando PCA')
     st.plotly_chart(fig)
 
-    # Preparar el archivo Excel en memoria
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False)
-        writer.save()
+    # Preparar el archivo CSV en memoria
+    csv = df.to_csv(index=False)
 
     # Crear botón de descarga
     st.download_button(
-        label="Descargar Excel con Resultados",
-        data=output.getvalue(),
-        file_name='resultados_cluster.xlsx',
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        label="Descargar CSV con Resultados",
+        data=csv,
+        file_name='resultados_cluster.csv',
+        mime='text/csv'
     )
